@@ -1685,7 +1685,92 @@ Polymer$0({
         activeElTabIndex !== SECRET_TABINDEX) {
       return;
     }
-    this.toggleSelectionForItem(model[this.as]);
+    // this.toggleSelectionForItem(model[this.as]);
+
+    var sourceEvent = e && e.detail && e.detail.sourceEvent;
+
+    // Handle `shift` click scenario
+    if (this.multiSelection && this.selectedItems.length && sourceEvent.shiftKey) {
+      this._shiftSelectHandler(model[this.as]);
+    } else {
+      this.toggleSelectionForItem(model[this.as]);
+    }
+  },
+
+  // _shiftSelectHandler: function(selectedItem) {
+  //   var selectedIndex = this.items.indexOf(selectedItem);
+  //   var _selectedItemIndexes = this.selectedItems.map(function(item) {
+  //     return this.items.indexOf(item);
+  //   }.bind(this));
+  //    var firstSelectedIndex = _selectedItemIndexes.reduce(function(currentIndex, itemIndex) {
+  //     return Math.min(currentIndex, itemIndex);
+  //   });
+  //    var lastSelectedIndex = _selectedItemIndexes.reduce(function(currentIndex, itemIndex) {
+  //     return Math.max(currentIndex, itemIndex);
+  //   });
+  //
+  //   var startIndex = Math.min(selectedIndex, firstSelectedIndex);
+  //   var lastIndex = Math.max(selectedIndex, lastSelectedIndex);
+  //    // Select the range created with the shift select
+  //   this._selectRange(startIndex, lastIndex);
+  //    // Deselect everything outside of the shift select range (will only occur
+  //   // if a user shift selects in the middle of a range)
+  //   if (selectedIndex > firstSelectedIndex && selectedIndex < lastSelectedIndex) {
+  //     this._deselectRange(selectedIndex + 1, lastSelectedIndex);
+  //   }
+  // },
+
+  _shiftSelectHandler: function(selectedItem) {
+    var selectedIndex = this.items.indexOf(selectedItem);
+    var startIndex = Math.min(selectedIndex, this._lastSelectedIndex);
+    var lastIndex = Math.max(selectedIndex, this._lastSelectedIndex);
+    // Select the range created with the shift select
+    this._selectRange(startIndex, lastIndex);
+  },
+
+   /**
+   * Updates the models of all physical items
+   */
+  _updatePhysicalItemModels: function() {
+    this._physicalItems.map(function(el) {
+      return this.modelForElement(el);
+    }.bind(this)).forEach(function(model) {
+      model[this.selectedAs] = (this.$.selector).isSelected(this.items[model[this.indexAs]]);
+    }.bind(this));
+  },
+
+   /**
+   * UnSelect all items in a certain range (inclusive of both start and end)
+   */
+  _deselectRange: function(start, end) {
+    this.items.slice(start, end + 1)
+      .map(function(item) {
+        return this._getNormalizedItem(item);
+      }.bind(this))
+      .filter(function(item) {
+        return (this.$.selector).isSelected(item);
+      }.bind(this))
+      .forEach(function(item) {
+        this.$.selector.deselect(item);
+      }.bind(this));
+    this._updatePhysicalItemModels();
+  },
+
+   /**
+   * Select all items in a certain range (inclusive of both start and end)
+   */
+  _selectRange: function(start, end) {
+    this.items.slice(start, end + 1)
+      .map(function(item) {
+        return this._getNormalizedItem(item);
+      }.bind(this))
+      .filter(function(item) {
+        return !(this.$.selector).isSelected(item);
+      }.bind(this))
+      .forEach(function(item) {
+        this.$.selector.select(item);
+      }.bind(this));
+    this._updatePhysicalItemModels();
   },
 
   _multiSelectionChanged: function(multiSelection) {
