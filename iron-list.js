@@ -1630,7 +1630,14 @@ Polymer$0({
     var isSelected = this.$.selector.isIndexSelected ?
         this.$.selector.isIndexSelected(index) :
         this.$.selector.isSelected(this.items[index]);
-    isSelected ? this.deselectIndex(index) : this.selectIndex(index);
+
+    if (isSelected) {
+        this._lastSelectedIndex = -1;
+        this.deselectIndex(index)
+      } else {
+        this._lastSelectedIndex = index;
+        this.selectIndex(index);
+      }
   },
 
   /**
