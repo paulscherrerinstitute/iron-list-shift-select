@@ -1780,6 +1780,22 @@ Polymer$0({
     this._updatePhysicalItemModels();
   },
 
+  /**
+   * Gets a valid item instance from its index or the object value.
+   *
+   * @param {(Object|number)} item The item object or its index
+   */
+  _getNormalizedItem: function(item) {
+    if (typeof item === 'number') {
+      item = this.items[item];
+      if (!item) {
+        throw new RangeError('<item> not found');
+      }
+      return item;
+    }
+    return item;
+  },
+
   _multiSelectionChanged: function(multiSelection) {
     this.clearSelection();
     this.$.selector.multi = multiSelection;
