@@ -1,7 +1,7 @@
 {
   "files": {
-    "iron-list.html": {
-      "convertedUrl": "iron-list.js",
+    "iron-list-shift-select.html": {
+      "convertedUrl": "iron-list-shift-select.js",
       "exports": {}
     },
     "index.html": {

@@ -302,7 +302,7 @@ Polymer$0({
     </div>
 `,
 
-  is: 'iron-list',
+  is: 'iron-list-shift-select',
 
   properties: {
 

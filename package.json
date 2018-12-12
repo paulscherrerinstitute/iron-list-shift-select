@@ -1,5 +1,5 @@
 {
-  "description": "Displays a virtual, 'infinite' scrolling list of items",
+  "description": "Displays a virtual, 'infinite' scrolling list of items, including shift-select capabilities.",
   "keywords": [
     "web-components",
     "polymer",
@@ -8,10 +8,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/PolymerElements/iron-list"
+    "url": "git://github.com/paulscherrerinstitute/iron-list-shift-select"
   },
-  "homepage": "https://github.com/PolymerElements/iron-list",
-  "name": "@polymer/iron-list",
+  "homepage": "https://github.com/paulscherrerinstitute/iron-list-shift-select",
+  "name": "paulscherrerinstitute/iron-list-shift-select",
   "license": "BSD-3-Clause",
   "devDependencies": {
     "@polymer/app-layout": "^3.0.0-pre.26",
@@ -40,8 +40,8 @@
     "prepare": "npm run generate-types"
   },
   "version": "3.0.1",
-  "main": "iron-list.js",
-  "author": "The Polymer Authors",
+  "main": "iron-list-shift-select.js",
+  "author": "PSI developers",
   "dependencies": {
     "@polymer/polymer": "^3.0.0",
     "@polymer/iron-resizable-behavior": "^3.0.0-pre.26",
