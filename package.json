@@ -11,7 +11,7 @@
     "url": "git://github.com/paulscherrerinstitute/iron-list-shift-select"
   },
   "homepage": "https://github.com/paulscherrerinstitute/iron-list-shift-select",
-  "name": "paulscherrerinstitute/iron-list-shift-select",
+  "name": "@paulscherrerinstitute/iron-list-shift-select",
   "license": "BSD-3-Clause",
   "devDependencies": {
     "@polymer/app-layout": "^3.0.0-pre.26",
