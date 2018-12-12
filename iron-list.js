@@ -1630,7 +1630,14 @@ Polymer$0({
     var isSelected = this.$.selector.isIndexSelected ?
         this.$.selector.isIndexSelected(index) :
         this.$.selector.isSelected(this.items[index]);
-    isSelected ? this.deselectIndex(index) : this.selectIndex(index);
+
+    if (isSelected) {
+        this._lastSelectedIndex = -1;
+        this.deselectIndex(index)
+      } else {
+        this._lastSelectedIndex = index;
+        this.selectIndex(index);
+      }
   },
 
   /**
@@ -1685,7 +1692,108 @@ Polymer$0({
         activeElTabIndex !== SECRET_TABINDEX) {
       return;
     }
-    this.toggleSelectionForItem(model[this.as]);
+    // this.toggleSelectionForItem(model[this.as]);
+
+    var sourceEvent = e && e.detail && e.detail.sourceEvent;
+
+    // Handle `shift` click scenario
+    if (this.multiSelection && this.selectedItems.length && sourceEvent.shiftKey) {
+      this._shiftSelectHandler(model[this.as]);
+    } else {
+      this.toggleSelectionForItem(model[this.as]);
+    }
+  },
+
+  // _shiftSelectHandler: function(selectedItem) {
+  //   var selectedIndex = this.items.indexOf(selectedItem);
+  //   var _selectedItemIndexes = this.selectedItems.map(function(item) {
+  //     return this.items.indexOf(item);
+  //   }.bind(this));
+  //    var firstSelectedIndex = _selectedItemIndexes.reduce(function(currentIndex, itemIndex) {
+  //     return Math.min(currentIndex, itemIndex);
+  //   });
+  //    var lastSelectedIndex = _selectedItemIndexes.reduce(function(currentIndex, itemIndex) {
+  //     return Math.max(currentIndex, itemIndex);
+  //   });
+  //
+  //   var startIndex = Math.min(selectedIndex, firstSelectedIndex);
+  //   var lastIndex = Math.max(selectedIndex, lastSelectedIndex);
+  //    // Select the range created with the shift select
+  //   this._selectRange(startIndex, lastIndex);
+  //    // Deselect everything outside of the shift select range (will only occur
+  //   // if a user shift selects in the middle of a range)
+  //   if (selectedIndex > firstSelectedIndex && selectedIndex < lastSelectedIndex) {
+  //     this._deselectRange(selectedIndex + 1, lastSelectedIndex);
+  //   }
+  // },
+
+  _shiftSelectHandler: function(selectedItem) {
+    var selectedIndex = this.items.indexOf(selectedItem);
+    var startIndex = Math.min(selectedIndex, this._lastSelectedIndex);
+    var lastIndex = Math.max(selectedIndex, this._lastSelectedIndex);
+    // Select the range created with the shift select
+    this._selectRange(startIndex, lastIndex);
+  },
+
+   /**
+   * Updates the models of all physical items
+   */
+  _updatePhysicalItemModels: function() {
+    this._physicalItems.map(function(el) {
+      return this.modelForElement(el);
+    }.bind(this)).forEach(function(model) {
+      model[this.selectedAs] = (this.$.selector).isSelected(this.items[model[this.indexAs]]);
+    }.bind(this));
+  },
+
+   /**
+   * UnSelect all items in a certain range (inclusive of both start and end)
+   */
+  _deselectRange: function(start, end) {
+    this.items.slice(start, end + 1)
+      .map(function(item) {
+        return this._getNormalizedItem(item);
+      }.bind(this))
+      .filter(function(item) {
+        return (this.$.selector).isSelected(item);
+      }.bind(this))
+      .forEach(function(item) {
+        this.$.selector.deselect(item);
+      }.bind(this));
+    this._updatePhysicalItemModels();
+  },
+
+   /**
+   * Select all items in a certain range (inclusive of both start and end)
+   */
+  _selectRange: function(start, end) {
+    this.items.slice(start, end + 1)
+      .map(function(item) {
+        return this._getNormalizedItem(item);
+      }.bind(this))
+      .filter(function(item) {
+        return !(this.$.selector).isSelected(item);
+      }.bind(this))
+      .forEach(function(item) {
+        this.$.selector.select(item);
+      }.bind(this));
+    this._updatePhysicalItemModels();
+  },
+
+  /**
+   * Gets a valid item instance from its index or the object value.
+   *
+   * @param {(Object|number)} item The item object or its index
+   */
+  _getNormalizedItem: function(item) {
+    if (typeof item === 'number') {
+      item = this.items[item];
+      if (!item) {
+        throw new RangeError('<item> not found');
+      }
+      return item;
+    }
+    return item;
   },
 
   _multiSelectionChanged: function(multiSelection) {
